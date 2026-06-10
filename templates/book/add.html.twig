@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add Book{% endblock %}
+
+{% block body %}
+    <a href="{{ path('app.books.index') }}" class="btn btn-sm btn-outline-primary float-end">Back</a>
+    <h5 class="mb-3">Create New Book</h5>
+    <hr />
+    <div class="row">
+        <div class="col-6">
+            {{ form_start(form) }}
+                {{ form_widget(form) }}
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Authentication{% endblock %}
+
+{% block body %}
+    {% if error %}
+        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+    <h5 class="mb-3">Login</h5>
+    <hr />
+    {% if not app.user %}
+        <div class="row">
+            <div class="col-4 mx-auto">
+                <form method="post" class="mt-3">
+                    <div class="mb-3">
+                        <label class="form-label" for="input-email">Email</label>
+                        <input type="email" value="{{ last_username }}" name="_username" id="input-email" class="form-control form-control-lg" autocomplete="email" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="input-password">Password</label>
+                        <input type="password" name="_password" id="input-password" class="form-control form-control-lg" autocomplete="current-password" required>
+                    </div>
+                    <div class="mb-3 d-grid">                    
+                        <button type="submit" class="btn btn-lg btn-primary">
+                            Login
+                        </button>
+                    </div>
+                    <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+                </form>
+                <div class="text-center">
+                    <p>Don't have an account? <a href="{{ path('app.register') }}">Register</a></p>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            You are logged in as {{ app.user.firstname }} ({{ app.user.userIdentifier }}), <a href="{{ logout_path() }}">Logout</a>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,38 @@
+<nav class="navbar navbar-expand-lg bg-light mb-3">
+    <div class="container">
+        <a href="{{ path('app.books.index') }}" class="navbar-brand">BookStore</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {% if not app.user %}
+                    <li class="nav-item">
+                        <a href="{{ path('app.login') }}" class="nav-link text-secondary">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ path('app.register') }}" class="nav-link text-secondary">Register</a>
+                    </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a href="{{ path('app.books.add') }}" class="nav-link text-secondary">Add Book</a>
+                </li>
+            </ul>
+            <form action="{{ path('app.books.index') }}" method="get" class="d-flex">
+                <input type="search" name="search" value="{{ app.request.query.get('search', '') }}" class="form-control me-2" placeholder="Search" aria-label="Search" />
+                <input type="hidden" name="sort" value="b.price" />
+                <button type="submit" class="btn btn-outline-success">Search</button>
+                {% if (app.request.query.get('search')) %}
+                    <a href="{{ path('app.books.index') }}" class="btn btn-outline-secondary ms-2">Clear</a>
+                {% endif %}
+            </form>
+            {% if app.user %}
+                <ul class="navbar-nav ms-2 mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a href="{{ logout_path() }}" class="nav-link">Logout</a>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+</nav>

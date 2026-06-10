@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Book List{% endblock %}
+
+{% block body %}
+    <form action="{{ path('app.books.index') }}" method="get" class="d-flex float-end" role="search">
+        <input type="hidden" name="search" value="{{ app.request.query.get('search') }}" />
+        <select name="sort" class="form-select form-select-sm" onchange="this.form.submit();">
+            <option value="b.price" {{ app.request.query.get('sort') === 'b.price' ? 'selected' : '' }}>Price: Low to High</option>
+            <option value="-b.price" {{ app.request.query.get('sort') === '-b.price' ? 'selected' : '' }}>Price: High to Low</option>
+        </select>
+    </form>
+    <h5>Book List ({{ books|length }})</h5>
+    <hr />
+    <div class="row">
+        {% for book in books %}
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        {% if book.images|first %}
+                            <a href="{{ path('app.books.show', { 'slug': book.title|slug, 'id': book.id }) }}" title="{{ book.title }}" class="d-inline-block mb-1 h6 text-dark">
+                                <img src="{{ image_path(book.images|first.file) }}" alt="{{ book.title }}" class="img-fluid mb-3" />
+                            </a>
+                        {% endif %}
+                        <a href="{{ path('app.books.show', { 'slug': book.title|slug, 'id': book.id }) }}" class="d-inline-block mb-1 h6 text-dark">
+                            {{ book.title }}
+                        </a>
+                        <p class="small text-secondary mb-0">ISBN: {{ book.isbn }}</p>
+                        <p class="text-danger mb-0">
+                            <strong>${{ book.price }}</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

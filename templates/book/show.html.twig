@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ book.title }} {% endblock %}
+
+{% block body %}
+    <a href="{{ path('app.books.index') }}" class="btn btn-sm btn-outline-primary me-2">Back</a>
+    <a href="{{ path('app.books.edit', { 'id': book.id }) }}" class="btn btn-sm btn-outline-secondary">Edit️</a>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            {% if book.images|first %}
+                <div class="card">
+                    <div class="card-body">
+                        <img src="{{ image_path(book.images|first.file) }}" alt="{{ book.title }}" class="img-fluid mb-3" />
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <h5>{{ book.title }}</h5>
+            <p class="small text-secondary mb-1">ISBN: {{ book.isbn }}</p>
+            <p class="text-danger mb-2">
+                <strong>${{ book.price }}</strong>
+            </p>
+            <p>
+                {{ book.description|nl2br }}
+            </p>
+        </div>
+    </div>
+{% endblock %}

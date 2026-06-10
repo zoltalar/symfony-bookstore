@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Book{% endblock %}
+
+{% block body %}
+    <a href="{{ path('app.books.index') }}" class="btn btn-sm btn-outline-primary float-end">Back</a>
+    <h5 class="mb-3">
+        Edit Book
+        <small class="text-secondary ms-2">{{ book.title }}</small>
+    </h5>
+    <hr />
+    {{ form_start(form) }}
+        <div class="row">
+            <div class="col-6">
+                {{ form_widget(form) }}
+            </div>
+            <div class="col-6">
+                {% for image in book.images %}                    
+                    <div class="position-relative d-flex justify-content-center align-items-center image-container mb-3">
+                        <img src="{{ asset('uploads/books/' ~ image.file) }}" class="img-thumbnail">
+                        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
+                            <a href="{{ path('app.images.delete', { 'id': image.id, 'return_uri': app.request.requesturi }) }}" class="btn btn-secondary">🗑️</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}
