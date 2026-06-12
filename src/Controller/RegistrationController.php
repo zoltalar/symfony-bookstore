@@ -19,7 +19,7 @@ final class RegistrationController extends AbstractController
     ) {}
     
     #[Route('/register', name: 'app.register')]
-    public function add(Request $request): Response
+    public function register(Request $request): Response
     {
         $customer = new Customer;
         

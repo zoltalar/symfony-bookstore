@@ -18,6 +18,12 @@
         </div>
         <div class="col-md-8">
             <h5>{{ book.title }}</h5>
+            {% if (book.authors|length > 0) %}
+                <p class="mb-2">
+                    by
+                    {% for author in book.authors %}{{ author.name }}{% if not loop.last %}, {% endif %}{% endfor %}
+                </p>
+            {% endif %}
             <p class="small text-secondary mb-1">ISBN: {{ book.isbn }}</p>
             <p class="text-danger mb-2">
                 <strong>${{ book.price }}</strong>

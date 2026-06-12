@@ -20,20 +20,17 @@ class RegistrationFormType extends AbstractType
             ->add('firstName', TextType::class, [
                 'label' => 'First Name',
                 'attr' => [
-                    'class' => 'form-control form-control-lg',
                     'maxlength' => 100,
                 ]
             ])
             ->add('lastName', TextType::class, [
                 'label' => 'Last Name',
                 'attr' => [
-                    'class' => 'form-control form-control-lg',
                     'maxlength' => 100
                 ]
             ])
             ->add('email', EmailType::class, [
                 'attr' => [
-                    'class' => 'form-control form-control-lg',
                     'maxlength' => 255
                 ]
             ])
@@ -42,23 +39,13 @@ class RegistrationFormType extends AbstractType
                 'mapped' => false,
                 'first_options' => [
                     'label' => 'Password',
-                    'attr' => [
-                        'class' => 'form-control form-control-lg',
-                    ]
                 ],
                 'second_options' => [
                     'label' => 'Repeat Password',
-                    'attr' => [
-                        'class' => 'form-control form-control-lg',
-                    ]
                 ],
                 'invalid_message' => 'The password fields must match',
             ])
-            ->add('register', SubmitType::class, [
-                'attr' => [
-                    'class' => 'btn btn-lg btn-primary'
-                ]
-            ]);
+            ->add('register', SubmitType::class);;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

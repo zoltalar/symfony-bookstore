@@ -3,14 +3,15 @@
 {% block title %}Register{% endblock %}
 
 {% block body %}
+    {{ form_errors(form) }}
     <h5 class="mb-3">Register</h5>
     <hr />
     <div class="row">
         <div class="col-4 mx-auto">
-            {{ form_start(form, {'attr': {'class': 'mt-3'}}) }}
+            {{ form_start(form, {'attr': {'class': 'mt-3', 'novalidate': 'novalidate'}}) }}
                 {{ form_widget(form) }}
             {{ form_end(form) }}
-            <div>
+            <div class="text-center">
                 <p>Already registered? <a href="{{ path('app.login') }}">Login</a></p>
             </div>
         </div>

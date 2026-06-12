@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\BookRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
 class Book
@@ -16,22 +18,24 @@ class Book
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotBlank]
     private ?string $isbn = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $title = null;
 
     #[ORM\Column(length: 2000, nullable: true)]
     private ?string $description = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $author = null;
     
     #[ORM\Column]
+    #[Assert\NotBlank]
+    #[Assert\Positive]
+    #[Assert\LessThanOrEqual(value: 10000)]
     private ?float $price = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $publicationDate = null;
+    private ?DateTimeImmutable $publicationDate = null;
 
     /**
      * @var Collection<int, Image>
@@ -39,9 +43,17 @@ class Book
     #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'book')]
     private Collection $images;
 
+    /**
+     * @var Collection<int, Author>
+     */
+    #[ORM\ManyToMany(targetEntity: Author::class, inversedBy: 'books')]
+    #[ORM\OrderBy(['lastName' => 'ASC', 'firstName' => 'ASC'])]
+    private Collection $authors;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
+        $this->authors = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -84,18 +96,6 @@ class Book
 
         return $this;
     }
-
-    public function getAuthor(): ?string
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(string $author): static
-    {
-        $this->author = $author;
-
-        return $this;
-    }
     
     public function getPrice(): ?float
     {
@@ -109,12 +109,12 @@ class Book
         return $this;
     }
 
-    public function getPublicationDate(): ?\DateTimeImmutable
+    public function getPublicationDate(): ?DateTimeImmutable
     {
         return $this->publicationDate;
     }
 
-    public function setPublicationDate(?\DateTimeImmutable $publicationDate): static
+    public function setPublicationDate(?DateTimeImmutable $publicationDate): static
     {
         $this->publicationDate = $publicationDate;
 
@@ -157,5 +157,29 @@ class Book
         }
         
         return null;
+    }
+
+    /**
+     * @return Collection<int, Author>
+     */
+    public function getAuthors(): Collection
+    {
+        return $this->authors;
+    }
+
+    public function addAuthor(Author $author): static
+    {
+        if (!$this->authors->contains($author)) {
+            $this->authors->add($author);
+        }
+
+        return $this;
+    }
+
+    public function removeAuthor(Author $author): static
+    {
+        $this->authors->removeElement($author);
+
+        return $this;
     }
 }

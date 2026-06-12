@@ -2,17 +2,20 @@
 
 namespace App\Controller;
 
+use App\Entity\Author;
 use App\Entity\Book;
 use App\Entity\Image;
-use App\Form\BookEditFormType;
-use App\Form\BookFormType;
+use App\Form\BookEditType;
+use App\Form\BookType;
 use App\Service\ImageHandler;
+use App\Service\NameParser;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class BookController extends AbstractController
 {
@@ -36,14 +39,15 @@ final class BookController extends AbstractController
     }
     
     #[Route('/books/add', name: 'app.books.add')]
+    #[IsGranted('ROLE_USER')]
     public function add(Request $request): Response
     {
         $book = new Book;
         
-        $form = $this->createForm(BookFormType::class, $book);
+        $form = $this->createForm(BookType::class, $book);
         $form->handleRequest($request);
         
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
             $this->entityManager->persist($form->getData());
             $this->entityManager->flush();
             
@@ -65,38 +69,78 @@ final class BookController extends AbstractController
     }
     
     #[Route('/books/edit/{id}', name: 'app.books.edit')]
+    #[IsGranted('ROLE_USER')]
     public function edit(Request $request, Book $book): Response
-    {
-        $form = $this->createForm(BookEditFormType::class, $book);
+    {        
+        $form = $this->createForm(BookEditType::class, $book, [
+            'selected_authors' => $book->getAuthors()->toArray()
+        ]);
+        
         $form->handleRequest($request);
         
-        if ($form->isSubmitted() && $form->isValid()) {
-            $uploadImages = $form->get('uploadImages')->getData();
+        if ($form->isSubmitted()) {
             
-            if ($uploadImages) {
-                $files = is_array($uploadImages) ? $uploadImages : [$uploadImages];
+            if ($form->get('addNewAuthor')->isClicked()) {
+                $newAuthorName = $form->get('newAuthorName')->getData();
+                list($firstName, $lastName) = (new NameParser($newAuthorName))->parse();
                 
-                foreach ($files as $image) {
-                    if ($image) {
-                        try {
-                            $uploadData = $this->imageHandler->upload($image);
-                            
-                            $image = new Image();
-                            $image->setFile($uploadData['fileName']);
-                            $image->setSize($uploadData['fileSize']);
-                            $image->setMime($uploadData['mimeType']);
-                            $image->setBook($book);
-                            
-                            $this->entityManager->persist($image);
-                        } catch (Exception $e) {
-                            $this->addFlash('error', $e->getMessage());
+                $author = $this
+                    ->entityManager
+                    ->getRepository(Author::class)
+                    ->findOneBy([
+                        'firstName' => $firstName,
+                        'lastName' => $lastName
+                    ]);
+                
+                if (! $author) {
+                    $author = new Author;
+                    $author->setFirstName($firstName);
+                    $author->setLastName($lastName);
+                    
+                    $this->entityManager->persist($author);
+                    $this->entityManager->flush();
+                    
+                    $this->addFlash('success', sprintf('%s successfully added to the list of authors!', $author->getName()));
+                }
+                
+                return $this->redirectToRoute('app.books.edit', ['id' => $book->getId()]);
+            } elseif ($form->isValid()) {
+                $uploadImages = $form->get('uploadImages')->getData();
+                $authors = $form->get('authors')->getData();
+            
+                if ($uploadImages) {
+                    $files = is_array($uploadImages) ? $uploadImages : [$uploadImages];
+
+                    foreach ($files as $image) {
+                        if ($image) {
+                            try {
+                                $uploadData = $this->imageHandler->upload($image);
+
+                                $image = new Image();
+                                $image->setFile($uploadData['fileName']);
+                                $image->setSize($uploadData['fileSize']);
+                                $image->setMime($uploadData['mimeType']);
+                                $image->setBook($book);
+
+                                $this->entityManager->persist($image);
+                            } catch (Exception $e) {
+                                $this->addFlash('error', $e->getMessage());
+                            }
                         }
                     }
                 }
+                
+                foreach ($book->getAuthors() as $author) {
+                    $book->removeAuthor($author);
+                }
+                
+                foreach ($authors as $author) {
+                    $book->addAuthor($author);
+                }
+
+                $this->entityManager->flush();
+                $this->addFlash('success', 'Book updated successfully!');
             }
-            
-            $this->entityManager->flush();
-            $this->addFlash('success', 'Book updated successfully!');
             
             return $this->redirectToRoute('app.books.index');
         }
