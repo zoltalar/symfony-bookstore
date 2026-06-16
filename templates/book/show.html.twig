@@ -28,6 +28,11 @@
             <p class="text-danger mb-2">
                 <strong>${{ book.price }}</strong>
             </p>
+            <form action="{{ path('app.cart.add', { 'id': book.id }) }}" method="post" class="mt-3 mb-3">
+                <button type="submit" class="btn btn-lg btn-primary">
+                    Add to Cart
+                </button>
+            </form>
             <p>
                 {{ book.description|nl2br }}
             </p>

@@ -50,10 +50,17 @@ class Book
     #[ORM\OrderBy(['lastName' => 'ASC', 'firstName' => 'ASC'])]
     private Collection $authors;
 
+    /**
+     * @var Collection<int, Cart>
+     */
+    #[ORM\OneToMany(targetEntity: Cart::class, mappedBy: 'book')]
+    private Collection $carts;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
         $this->authors = new ArrayCollection();
+        $this->carts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -179,6 +186,36 @@ class Book
     public function removeAuthor(Author $author): static
     {
         $this->authors->removeElement($author);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cart>
+     */
+    public function getCarts(): Collection
+    {
+        return $this->carts;
+    }
+
+    public function addCart(Cart $cart): static
+    {
+        if (!$this->carts->contains($cart)) {
+            $this->carts->add($cart);
+            $cart->setBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCart(Cart $cart): static
+    {
+        if ($this->carts->removeElement($cart)) {
+            // set the owning side to null (unless already changed)
+            if ($cart->getBook() === $this) {
+                $cart->setBook(null);
+            }
+        }
 
         return $this;
     }

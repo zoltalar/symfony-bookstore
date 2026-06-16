@@ -45,7 +45,11 @@ class RegistrationFormType extends AbstractType
                 ],
                 'invalid_message' => 'The password fields must match',
             ])
-            ->add('register', SubmitType::class);;
+            ->add('register', SubmitType::class, [
+                'attr' => [
+                    'class' => 'btn btn-primary w-100'
+                ]
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

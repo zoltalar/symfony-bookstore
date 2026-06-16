@@ -1,0 +1,149 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Shopping Cart{% endblock %}
+
+{% block body %}
+    <h5 class="mb-3">Your Shopping Cart ({{ items|length }})</h5>
+    <hr />
+    {% if (items|length > 0) %}
+        <form action="{{ path('app.cart.index') }}" method="post" id="cart">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            {% for item in items %}
+                                <div class="row {% if not loop.last %} mb-3 {% endif %}">
+                                    <div class="col-md-7">
+                                        <p class="card-title mb-0">{{ item.book.title }}</p>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="input-group">
+                                            <button
+                                                type="button"
+                                                class="btn btn-outline-secondary btn-sm"
+                                                onclick="decrementQuantity(this, {{ item.id }})"
+                                                data-price="{{ item.book.price }}"
+                                            >
+                                                -
+                                            </button>
+                                            <input type="text" name="quantities[{{ item.id }}]" class="form-control form-control-sm text-center" value="{{ item.quantity }}">
+                                            <button
+                                                type="button"
+                                                class="btn btn-outline-secondary btn-sm"
+                                                onclick="incrementQuantity(this, {{ item.id }})"
+                                                data-price="{{ item.book.price }}"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p class="fw-bold text-danger text-center">
+                                            $<span id="cart-item-subtotal-{{ item.id }}">{{ item.subtotal }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-1 text-end">
+                                        <button type="submit" name="deleteCartItem" class="btn btn-outline-secondary btn-sm" onclick="return confirmCartItemDeletion({{ item.id }});">🗑</button>
+                                    </div>
+                                </div>
+                                {% if not loop.last %}
+                                    <hr />
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-primary float-end" onclick="updateCart()"> 🗘 Update Cart</button>
+                        <a href="{{ path('app.books.index') }}" class="btn btn-primary"> ❮ Continue Shopping</a>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="fw-bold card-title mb-3">Order Summary</h6>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal</span>
+                                <span>${{ cart.subtotal }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping</span>
+                                <span>${{ cart.shipping }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tax</span>
+                                <span>${{ cart.tax }}</span>
+                            </div>
+                            <hr />
+                            <div class="d-flex justify-content-between mb-3">
+                                <strong>Total</strong>
+                                <strong class="text-danger">${{ cart.total }}</strong>
+                            </div>
+                            <div class="d-grid">
+                                <button class="btn btn-primary">Proceed to Checkout ❯ </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="itemId" value="" />
+            <input type="hidden" name="action" value="" />
+        </form>
+    {% else %}
+        <div class="alert alert-info">
+            Your shopping cart is empty.
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript">
+        const confirmCartItemDeletion = (id) => {
+            if (confirm('Are you sure?')) {
+                const form = document.getElementById('cart')
+                form.method = 'post'
+                form.elements['itemId'].value = id
+                form.elements['action'].value = 'delete'
+                return true
+            } else {
+                return false;
+            }
+        }
+        const decrementQuantity = (button, id) => {
+            const form = document.getElementById('cart')
+            const subtotal = document.getElementById('cart-item-subtotal-' + id)
+            const element = form.elements['quantities[' + id + ']']
+            const price = Number(button.getAttribute('data-price'))
+            let quantity = element.value
+            if (isNaN(quantity)) {
+                quantity = 1
+            }
+            if (quantity > 0) {
+                quantity--
+            }
+            element.value = quantity
+            subtotal.innerText = (new Intl.NumberFormat().format(price * quantity));
+        }
+        const incrementQuantity = (button, id) => {
+            const form = document.getElementById('cart')
+            const subtotal = document.getElementById('cart-item-subtotal-' + id)
+            const element = form.elements['quantities[' + id + ']']
+            const price = Number(button.getAttribute('data-price'))
+            const max = 100
+            let quantity = element.value
+            if (isNaN(quantity)) {
+                quantity = 1
+            }
+            if (quantity < max) {
+                quantity++
+            }
+            element.value = quantity
+            subtotal.innerText = (new Intl.NumberFormat().format(price * quantity));
+        }
+        const updateCart = () => {
+            const form = document.getElementById('cart')
+            form.method = 'post'
+            form.elements['action'].value = 'update'
+            form.submit();
+        }
+    </script>
+{% endblock %}
