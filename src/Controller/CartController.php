@@ -8,6 +8,7 @@ use App\Entity\Customer;
 use App\Service\Cart as CartService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -23,10 +24,15 @@ final class CartController extends AbstractController
     #[Route('/cart/index', name: 'app.cart.index')]
     public function index(Request $request): Response
     {
+        $asJson = false;
         $customer = $this->getUser();
         
         if ($customer) {
             $this->cartService->setCustomer($customer);
+        }
+        
+        if ($request->headers->get('Accept') === 'application/json') {
+            $asJson = true;
         }
         
         if ($request->isMethod('post')) {
@@ -72,7 +78,13 @@ final class CartController extends AbstractController
                 }
             }
             
-            return $this->redirectToRoute('app.cart.index');
+            if ( ! $asJson) {
+                return $this->redirectToRoute('app.cart.index');
+            }
+        }
+        
+        if ($asJson) {
+            return new JsonResponse($this->cartService->toArray());
         }
         
         return $this->render('cart/index.html.twig', [
@@ -81,7 +93,7 @@ final class CartController extends AbstractController
         ]);
     }
     
-    #[Route('/card/add/{id}', name: 'app.cart.add', methods: ['POST'])]
+    #[Route('/cart/add/{id}', name: 'app.cart.add', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function add(Request $request, Book $book): Response
     {
@@ -111,5 +123,19 @@ final class CartController extends AbstractController
         }
         
         return $this->redirectToRoute('app.cart.index');
+    }
+    
+    #[Route('/cart/data', name: 'app.cart.data')]
+    public function data(): JsonResponse
+    {
+        $data = [];
+        $customer = $this->getUser();
+        
+        if ($customer) {
+            $this->cartService->setCustomer($customer);
+            $data = $this->cartService->toArray();
+        }
+        
+        return new JsonResponse($data);
     }
 }

@@ -40,6 +40,22 @@ final class Cart
         return [];
     }
     
+    public function getCartItemArray(): array
+    {
+        $array = [];
+        $items = $this->getCartItems();
+        
+        foreach ($items as $item) {            
+            $array[] = [
+                'id' => $item->getId(),
+                'quantity' => $item->getQuantity(),
+                'book_subtotal' => $item->getBook()->getSubtotal($item->getQuantity())
+            ];
+        }
+        
+        return $array;
+    }
+    
     public function getSubtotal(): float
     {
         $subtotal = 0;
@@ -51,7 +67,7 @@ final class Cart
             }
         }
         
-        return $subtotal;
+        return round($subtotal, 2);
     }
     
     public function getShipping(): float
@@ -71,6 +87,17 @@ final class Cart
     
     public function getTotal(): float
     {
-        return $this->getSubtotal() + $this->getShipping() + $this->getTax();
+        return round($this->getSubtotal() + $this->getShipping() + $this->getTax(), 2);
+    }
+    
+    public function toArray(): array
+    {
+        return [
+            'items' => $this->getCartItemArray(),
+            'subtotal' => $this->getSubtotal(),
+            'shipping' => $this->getShipping(),
+            'tax' => $this->getTax(),
+            'total' => $this->getTotal()
+        ];
     }
 }

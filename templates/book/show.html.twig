@@ -3,8 +3,8 @@
 {% block title %} {{ book.title }} {% endblock %}
 
 {% block body %}
+    <a href="{{ path('app.books.edit', { 'id': book.id }) }}" class="btn float-end">✏️️</a>
     <a href="{{ path('app.books.index') }}" class="btn btn-sm btn-outline-primary me-2">Back</a>
-    <a href="{{ path('app.books.edit', { 'id': book.id }) }}" class="btn btn-sm btn-outline-secondary">Edit️</a>
     <hr />
     <div class="row">
         <div class="col-md-4">

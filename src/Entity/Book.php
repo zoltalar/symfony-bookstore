@@ -219,4 +219,9 @@ class Book
 
         return $this;
     }
+    
+    public function getSubtotal(int $quantity): float
+    {
+        return round($quantity * $this->getPrice(), 2);
+    }
 }
