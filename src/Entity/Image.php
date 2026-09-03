@@ -89,4 +89,9 @@ class Image
 
         return $this;
     }
+    
+    public function getUrl(): string
+    {
+        return sprintf('/uploads/books/%s', $this->getFile());
+    }
 }
