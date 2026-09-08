@@ -2,6 +2,7 @@
 
 namespace App\Repository\Trait;
 
+use App\Dto\PaginatedResultDto;
 use App\Service\Phrases;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
@@ -16,7 +17,7 @@ trait AdvancedSearchTrait
         string $sort,
         int $page = 1,
         int $limit = 10
-    ): array
+    ): PaginatedResultDto
     {
         $queryBuilder = $this->createQueryBuilder($this->getEntityAlias());        
         $columns = $this->getSearchableColumns();
@@ -48,19 +49,14 @@ trait AdvancedSearchTrait
             ->setMaxResults($limit);
         
         $paginator = new Paginator($queryBuilder);
-        $total = $paginator->count();
         
-        return [
-            'data' => iterator_to_array($paginator),
-            'meta' => [
-                'current_page' => $page,
-                'per_page' => $limit,
-                'has_more_pages' => ($total > $limit),
-                'total_pages' => ceil($total / $limit),
-                'from' => $from + 1,
-                'total' => $total
-            ]
-        ];
+        return new PaginatedResultDto(
+            iterator_to_array($paginator),
+            $total = $paginator->count(),
+            $page,
+            $limit,
+            (int) ceil($total / $limit)
+        );
     }
     
     private function extractPhrases(string $keywords): array

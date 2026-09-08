@@ -12,10 +12,10 @@
             <option value="-b.price" {{ app.request.query.get('sort') === '-b.price' ? 'selected' : '' }}>Price: High to Low</option>
         </select>
     </form>
-    <h5>Book List ({{ books.data|length }})</h5>
+    <h5>Book List ({{ books.entities|length }})</h5>
     <hr />
     <div class="row">
-        {% for book in books.data %}
+        {% for book in books.entities %}
             <div class="col-md-3">
                 <div class="card">
                     <div class="card-body">
@@ -36,10 +36,10 @@
             </div>
         {% endfor %}
     </div>
-    {% if (books.meta.total_pages > 1) %}
+    {% if (books.totalPages > 1) %}
         <div class="mt-3">
             {% set queryParams = app.request.query.all %}
-            {{ pagination.render(books.meta, 'app.books.index', {}, queryParams) }}
+            {{ pagination.render(books, 'app.books.index', {}, queryParams) }}
         </div>
     {% endif %}
 {% endblock %}
