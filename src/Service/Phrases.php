@@ -13,7 +13,7 @@ final class Phrases
         $sentence = trim(preg_replace('!\s+!', ' ', $this->sentence));
         
         if (! empty($sentence)) {
-            return explode(' ', $sentence);
+            return array_unique(explode(' ', $sentence));
         }
         
         return [];

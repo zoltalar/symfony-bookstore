@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class BookController extends AbstractController
 {
     public function __construct(
-        private readonly BookRepository $bookRepository 
+        private readonly BookRepository $bookRepository
     ) {}
     
     #[Route('/api/v2/books/index', name: 'app.api.books.index')]
@@ -33,8 +33,8 @@ final class BookController extends AbstractController
         
         $total = $this->bookRepository->count();
         
-        $bookDtos = array_map(function (Book $book) {
-            return $book->toDto();
+        $bookDtos = array_map(function (Book $book) use ($request) {
+            return $book->toDto($request->getSchemeAndHttpHost());
         }, $books);
         
         return $this->json([

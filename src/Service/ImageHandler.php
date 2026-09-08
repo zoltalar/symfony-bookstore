@@ -6,6 +6,7 @@ use App\Entity\Image;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 final class ImageHandler
@@ -18,7 +19,7 @@ final class ImageHandler
     
     public function delete(Image $image)
     {
-        $filePath = $this->getUploadDirectory() . '/' . $image->getFile();
+        $filePath = $this->getUploadDirectory() . DIRECTORY_SEPARATOR . $image->getFile();
         
         if (file_exists($filePath)) {
             unlink($filePath);

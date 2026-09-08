@@ -227,13 +227,14 @@ class Book
         return round($quantity * $this->getPrice(), 2);
     }
     
-    public function toDto(): BookDto
+    public function toDto(?string $baseUrl = null): BookDto
     {
         $dto = new BookDto();
         $dto->id = $this->getId();
         $dto->isbn = $this->getIsbn();
         $dto->title = $this->getTitle();
         $dto->description = $this->getDescription();
+        $dto->price = $this->getPrice();
         $dto->publicationDate = $this->getPublicationDate();
         
         foreach ($this->getAuthors() as $author) {
@@ -246,7 +247,7 @@ class Book
         foreach ($this->getImages() as $image) {
             $dto->images[] = [
                 'id' => $image->getId(),
-                'url' => $image->getUrl()
+                'url' => $image->getUrl($baseUrl)
             ];
         }
         

@@ -4,7 +4,7 @@
 
 {% block body %}
     <a href="{{ path('app.books.edit', { 'id': book.id }) }}" class="btn float-end">✏️️</a>
-    <a href="{{ path('app.books.index') }}" class="btn btn-sm btn-outline-primary me-2">Back</a>
+    <a href="{{ app.request.query.get('return_uri', path('app.books.index')) }}" class="btn btn-sm btn-outline-primary me-2">Back</a>
     <hr />
     <div class="row">
         <div class="col-md-4">

@@ -29,11 +29,13 @@ final class BookController extends AbstractController
     {
         $keywords = $request->query->get('search', '');
         $sort = $request->query->get('sort', 'b.price');
+        $page = $request->query->getInt('page', 1);
+        $limit = $request->query->getInt('limit', 8);
         
         $books = $this
             ->entityManager
             ->getRepository(Book::class)
-            ->advancedSearch($keywords, $sort);
+            ->advancedSearch($keywords, $sort, $page, $limit);
         
         return $this->render('book/index.html.twig', compact('books'));
     }

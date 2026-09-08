@@ -90,8 +90,12 @@ class Image
         return $this;
     }
     
-    public function getUrl(): string
+    public function getUrl(?string $baseUrl = null): string
     {
-        return sprintf('/uploads/books/%s', $this->getFile());
+        return sprintf(
+            '%s/uploads/books/%s',
+            (! is_null($baseUrl) ? $baseUrl : ''),
+            $this->getFile()
+        );
     }
 }

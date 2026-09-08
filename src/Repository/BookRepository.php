@@ -3,64 +3,34 @@
 namespace App\Repository;
 
 use App\Entity\Book;
-use App\Service\Phrases;
+use App\Repository\Trait\AdvancedSearchTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Override;
 
 /**
  * @extends ServiceEntityRepository<Book>
  */
 class BookRepository extends ServiceEntityRepository
 {
+    use AdvancedSearchTrait;
+    
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Book::class);
     }
     
-    public function advancedSearch(string $keywords, string $sort): array
+    #[Override]
+    protected function getSearchableColumns(): array
     {
-        $queryBuilder = $this->createQueryBuilder('b');
-        
-        $columns = $this->getSearchableColumns();
-        $phrases = (new Phrases($keywords))->extract();
-        $orderBy = $this->getOrderBy($sort);
-        
-        foreach ($phrases as $phrase) {
-            $parameter = sprintf('search_%s', uniqid());
-            
-            $queryBuilder
-                ->andWhere(
-                    $queryBuilder->expr()->orX(
-                       ...array_map(fn (string $column) => $queryBuilder->expr()->like($column, ":{$parameter}"), $columns)
-                    )
-                )
-                ->setParameter($parameter, "%$phrase%");
-        }
-        
-        return $queryBuilder
-            ->orderBy($orderBy['column'], $orderBy['direction'])
-            ->getQuery()
-            ->getResult();
+        return array_map(function (string $column) {
+            return implode('.', [$this->getEntityAlias(), $column]);
+        }, ['title', 'isbn']);
     }
-    
-    private function getSearchableColumns(): array
+
+    #[Override]
+    protected function getEntityAlias(): string
     {
-        return ['b.title', 'b.isbn'];
-    }
-    
-    private function getOrderBy(string $sort): array
-    {
-        $column = $sort;
-        $direction = 'ASC';
-        
-        if (str_starts_with($sort, '-')) {
-            $column = substr($sort, 1);
-            $direction = 'DESC';
-        }
-        
-        return [
-            'column' => $column,
-            'direction' => $direction
-        ];
+        return 'b';
     }
 }

@@ -10,6 +10,7 @@ final class BookDto
     public ?string $isbn;
     public ?string $title;
     public ?string $description;
+    public ?float $price;
     public ?DateTimeImmutable $publicationDate;
     public array $authors = [];
     public array $images = [];
