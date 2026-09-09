@@ -12,6 +12,8 @@ trait AdvancedSearchTrait
     
     abstract protected function getEntityAlias(): string;
     
+    abstract protected function getDtoClassName(): string;
+    
     public function advancedSearch(
         string $keywords,
         string $sort,
@@ -50,8 +52,16 @@ trait AdvancedSearchTrait
         
         $paginator = new Paginator($queryBuilder);
         
+        $entities = array_map(
+            function ($entity) {
+                $dto = $this->getDtoClassName();
+                return $dto::fromEntity($entity);
+            },
+            iterator_to_array($paginator)
+        );
+        
         return new PaginatedResultDto(
-            iterator_to_array($paginator),
+            $entities,
             $total = $paginator->count(),
             $page,
             $limit,

@@ -21,7 +21,7 @@
                     <div class="card-body">
                         {% if book.images|first %}
                             <a href="{{ path('app.books.show', { 'slug': book.title|slug, 'id': book.id, 'return_uri': app.request.requesturi }) }}" title="{{ book.title }}" class="d-inline-block mb-1 h6 text-dark">
-                                <img src="{{ image_path(book.images|first.file) }}" alt="{{ book.title }}" class="img-fluid mb-3" />
+                                <img src="{{ book.images|first.uri }}" alt="{{ book.title }}" class="img-fluid mb-3" />
                             </a>
                         {% endif %}
                         <a href="{{ path('app.books.show', { 'slug': book.title|slug, 'id': book.id, 'return_uri': app.request.requesturi }) }}" class="d-inline-block mb-1 h6 text-dark">

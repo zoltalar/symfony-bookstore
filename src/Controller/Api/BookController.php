@@ -18,32 +18,15 @@ final class BookController extends AbstractController
     #[Route('/api/v2/books/index', name: 'app.api.books.index')]
     public function index(Request $request): Response
     {
+        $keywords = $request->query->get('search', '');
+        $sort = $request->query->get('sort', 'b.price');
         $page = $request->query->getInt('page', 1);
-        $limit = $request->query->getInt('limit', 10);
-        $offset = ($page - 1) * $limit;
+        $limit = $request->query->getInt('limit', 8);
         
         $books = $this
             ->bookRepository
-            ->findBy(
-                [],
-                ['publicationDate' => 'DESC'],
-                $limit,
-                $offset
-            );
+            ->advancedSearch($keywords, $sort, $page, $limit);
         
-        $total = $this->bookRepository->count();
-        
-        $bookDtos = array_map(function (Book $book) use ($request) {
-            return $book->toDto($request->getSchemeAndHttpHost());
-        }, $books);
-        
-        return $this->json([
-            'data' => $bookDtos,
-            'meta' => [
-                'current_page' => $page,
-                'limit' => $limit,
-                'total' => $total
-            ]
-        ]);
+        return $this->json($books->toArray());
     }
 }

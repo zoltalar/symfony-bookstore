@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use App\Dto\Api\BookDto;
 use App\Repository\BookRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -225,32 +224,5 @@ class Book
     public function getSubtotal(int $quantity): float
     {
         return round($quantity * $this->getPrice(), 2);
-    }
-    
-    public function toDto(?string $baseUrl = null): BookDto
-    {
-        $dto = new BookDto();
-        $dto->id = $this->getId();
-        $dto->isbn = $this->getIsbn();
-        $dto->title = $this->getTitle();
-        $dto->description = $this->getDescription();
-        $dto->price = $this->getPrice();
-        $dto->publicationDate = $this->getPublicationDate();
-        
-        foreach ($this->getAuthors() as $author) {
-            $dto->authors[] = [
-                'id' => $author->getId(),
-                'name' => $author->getName()
-            ];
-        }
-        
-        foreach ($this->getImages() as $image) {
-            $dto->images[] = [
-                'id' => $image->getId(),
-                'url' => $image->getUrl($baseUrl)
-            ];
-        }
-        
-        return $dto;
     }
 }
