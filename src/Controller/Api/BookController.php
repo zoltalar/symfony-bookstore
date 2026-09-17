@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Dto\Api\BookDto;
 use App\Entity\Book;
 use App\Repository\BookRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,5 +29,13 @@ final class BookController extends AbstractController
             ->advancedSearch($keywords, $sort, $page, $limit);
         
         return $this->json($books->toArray());
+    }
+    
+    #[Route('/api/v2/books/show/{id}', name: 'app.api.books.show')]
+    public function show(Book $book): Response
+    {
+        $bookDto = BookDto::fromEntity($book);
+        
+        return $this->json($bookDto);
     }
 }

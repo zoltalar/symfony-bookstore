@@ -17,6 +17,9 @@ security:
             # Ensure dev tools and static assets are always allowed
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
+        api_login:
+            pattern:   ^/api/v2/authentication/login
+            stateless: true
         main:
             lazy: true
             provider: app_customer_provider
